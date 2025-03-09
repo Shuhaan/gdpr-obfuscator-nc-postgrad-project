@@ -39,10 +39,16 @@ markupsafe==3.0.2
     #   werkzeug
 moto==5.0.25
     # via -r requirements.in
+numpy==2.2.3
+    # via pandas
 packaging==24.2
     # via pytest
+pandas==2.2.3
+    # via -r requirements.in
 pluggy==1.5.0
     # via pytest
+pyarrow==19.0.1
+    # via -r requirements.in
 pycparser==2.22
     # via cffi
 pytest==8.3.4
@@ -61,6 +67,9 @@ python-dateutil==2.9.0.post0
     # via
     #   botocore
     #   moto
+    #   pandas
+pytz==2025.1
+    # via pandas
 pyyaml==6.0.2
     # via responses
 requests==2.32.3
@@ -73,6 +82,8 @@ s3transfer==0.10.4
     # via boto3
 six==1.17.0
     # via python-dateutil
+tzdata==2025.1
+    # via pandas
 urllib3==2.3.0
     # via
     #   botocore
