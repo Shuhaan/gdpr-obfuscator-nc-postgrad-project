@@ -2,7 +2,8 @@ import pytest
 import io
 import csv
 from unittest.mock import MagicMock
-from s3_csv_obfuscation import get_s3_object, obfuscate_fields, obfuscate_csv
+from src.utils import get_s3_object, obfuscate_fields
+from src.main import obfuscate_csv
 
 def test_get_s3_object():
     mock_s3_client = MagicMock()
