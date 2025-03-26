@@ -1,91 +1,133 @@
-# GDPR Obfuscator Project
+# GDPR Obfuscator
 
+## Overview
+This project provides a tool to obfuscate personally identifiable information (PII) in files stored in AWS S3. It supports CSV, JSON, and Parquet formats.
 
-## Context
-The purpose of this project is to create a general-purpose tool to process data being ingested to AWS and
-intercept personally identifiable information (PII). All information stored by Northcoders data projects should be for bulk data analysis only. Consequently, there is a requirement under [GDPR](https://ico.org.uk/media/for-organisations/guide-to-data-protection/guide-to-the-general-data-protection-regulation-gdpr-1-1.pdf) to ensure that all data containing 
-information that can be used to identify an individual should be anonymised. 
+## Features
+- Automatically detects file types (.csv, .json, .parquet)
+- Obfuscates specified PII fields
+- Fetches files from AWS S3
+- Outputs obfuscated files as byte streams
 
+## Installation
+Ensure you have the required dependencies installed:
 
+```sh
+make requirements
+```
 
-## Assumptions and Prerequisites
-1. Data is stored in CSV-, JSON-, or parquet-formatted files in an AWS S3 bucket.
-2. Fields containing GDPR-sensitive data are known and will be supplied in advance.
-3. Data records will be supplied with a primary key.
+## Usage
 
-## High-level desired outcome
-You are required to provide an obfuscation tool that can be integrated as a library module into a Python codebase.
+### As a CLI Tool
+You can use this tool via a command-line interface:
 
-The tool will be supplied with the S3 location of a file containing sensitive information, and
-the names of the affected fields. It will create a new file or byte-stream object containing an 
-exact copy of the input file
-but with the sensitive data replaced with obfuscated strings. The calling procedure will handle saving the 
-output to its destination. 
-It is expected that the tool will be deployed within the AWS account.
+```sh
+python src/main.py --s3-uri s3://my-bucket/my-file.csv --pii-fields name,email
+```
 
-## Minimum viable product
-In the first instance, it is only necessary to be able to process CSV data.
+**Arguments:**
+- `--s3-uri` – S3 location of the file to be obfuscated
+- `--pii-fields` – Comma-separated list of PII fields to obfuscate
 
-The tool will be invoked by sending a JSON string containing:
-- the S3 location of the required CSV file for obfuscation
-- the names of the fields that are required to be obfuscated
+### As an Imported Function
+You can also import and use it within a Python script:
 
+```python
+from src.main import obfuscate_file
 
-For example, the input might be:
-```json
-{
-    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file1.csv",
-    "pii_fields": ["name", "email_address"]
+event = {
+    "file_to_obfuscate": "s3://my-bucket/my-file.csv",
+    "pii_fields": ["name", "email"]
 }
+
+obfuscated_file = obfuscate_file(event)
 ```
 
-The target CSV file might look like this:
-```csv
-student_id,name,course,cohort,graduation_date,email_address
-...
-1234,'John Smith','Software','2024-03-31','j.smith@email.com'
-...
+## Developer Guide
+
+### Setting Up the Environment
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/your-repo/gdpr-obfuscator-nc-postgrad-project.git
+   cd gdpr-obfuscator-nc-postgrad-project
+   ```
+2. Create a virtual environment and activate it:
+   ```sh
+   make create-environment
+   ```
+3. Install dependencies:
+   ```sh
+   make requirements
+   ```
+
+### Running Tests
+Run the test suite with:
+
+```sh
+make unit-test
 ```
 
-The output will be a byte-stream representation of a file like this:
-```csv
-student_id,name,course,cohort,graduation_date,email_address
-...
-1234,'***','Software','2024-03-31','***'
-...
+### Makefile Commands
+The `Makefile` provides useful automation:
+
+- **Create virtual environment:**
+  ```sh
+  make create-environment
+  ```
+- **Install dependencies:**
+  ```sh
+  make requirements
+  ```
+- **Set up development tools (bandit, safety, black, coverage):**
+  ```sh
+  make dev-setup
+  ```
+- **Run safety scan:**
+  ```sh
+  make safety-scan
+  ```
+- **Run bandit security check:**
+  ```sh
+  make run-bandit
+  ```
+- **Run black code formatting:**
+  ```sh
+  make run-black
+  ```
+- **Run unit tests:**
+  ```sh
+  make unit-test
+  ```
+- **Run coverage check:**
+  ```sh
+  make check-coverage
+  ```
+- **Run all checks (bandit, black, coverage):**
+  ```sh
+  make run-checks
+  ```
+- **Clean up environment:**
+  ```sh
+  make clean
+  ```
+
+## Project Structure
+```
+gdpr-obfuscator-nc-postgrad-project/
+│── src/
+│   ├── main.py  # Contains `obfuscate_file` function
+│   ├── utils/   # Contains helper functions (e.g., S3 operations, parsing, obfuscation)
+│── tests/       # Unit tests
+│── requirements.in  # Dependency definitions
+│── requirements.txt # Compiled dependencies
+│── Makefile     # Automation commands
+│── README.md    # Documentation
 ```
 
-The output format should provide content compatible with the `boto3` [S3 Put Object](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html) function.
+## Contributing
+1. Fork the repository and create a feature branch.
+2. Ensure code quality with `make run-checks` and `make unit-test`.
+3. Submit a pull request with a clear description.
 
-Invocation is likely to be via a tool such as EventBridge, Step Functions, or Airflow. The invocation mechanism
-is not a required element of this project.
-
-
-
-## Non-functional requirements
-- The tool should be written in Python, be unit tested, PEP-8 compliant, and tested for security vulnerabilities.
-- The code should include documentation.
-- No credentials are to be recorded in the code.
-- The complete size of the module should not exceed [the memory limits for Python Lambda dependencies](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html)
-
-
-## Performance criteria
-- The tool should be able to handle files of up to 1MB with a runtime of less than 1 minute
-
-
-## Possible extensions
-The MVP could be extended to allow for other file formats, primarily JSON and Parquet. The output file formats should be the same as the input formats.
-
-
-## Non-binding tech suggestions
-It is expected that the code will use the AWS SDK for Python (boto3). Code may be tested with any standard tool
-such as Pytest, Unittest, or Nose.
-
-The library should be suitable for deployment on a platform within the AWS ecosystem, such as EC2, ECS, or Lambda.
-
-Although the finished product is intended to be used as a library function invoked by other code, you may
-want to be able to demonstrate its use by invoking it from the command line.
-
-
-## Due date
-To be advised, but not later than four weeks from commencement.
+## License
+This project is licensed under the MIT License.
