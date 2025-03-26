@@ -91,40 +91,8 @@ check-coverage:
 ## Run all checks
 run-checks: run-bandit run-black check-coverage
 
-################################################################################################################
-# Terraform Commands
-## Format Terraform files
-terraform-fmt:
-	cd terraform && terraform fmt -recursive
-
-## Initialize Terraform
-terraform-init: terraform-fmt
-	cd terraform && terraform init
-
-## Validate Terraform configuration
-terraform-validate: terraform-init
-	cd terraform && terraform validate
-
-## Plan Terraform changes
-setup: terraform-validate
-	cd terraform && terraform plan -out=tfplan
-
-## Apply Terraform changes
-deploy:
-	cd terraform && terraform apply -auto-approve tfplan
-
-## Destroy Terraform-managed infrastructure
-terraform-destroy:
-	cd terraform && terraform destroy -auto-approve
-
 ## Clean up environment
 clean:
 	rm -rf venv .pytest_cache .coverage
 	find . -type f -name '*.pyc' -delete
 	find . -type d -name '__pycache__' -delete
-
-## Make docs
-pdocs:
-	export PYTHONPATH=src/extract_lambda:src/transform_lambda:src/load_lambda
-	$(call execute_in_env, pdoc -o docs src/*.py)
-	
