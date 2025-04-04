@@ -13,27 +13,45 @@ This project provides a tool to obfuscate personally identifiable information (P
 Ensure you have the required dependencies installed:
 
 ```sh
-make requirements
+pip install .
+```
+
+For development mode:
+
+```sh
+pip install -e .
 ```
 
 ## Usage
 
 ### As a CLI Tool
-You can use this tool via a command-line interface:
+
+Once installed, you can use this tool via the command line:
 
 ```sh
-python src/main.py --s3-uri s3://my-bucket/my-file.csv --pii-fields name,email
+gdpr-obfuscate --s3-uri s3://my-bucket/my-file.csv --pii-fields name,email
 ```
 
-**Arguments:**
-- `--s3-uri` – S3 location of the file to be obfuscated
-- `--pii-fields` – Comma-separated list of PII fields to obfuscate
+Arguments:
+-	--s3-uri – S3 location of the file to be obfuscated
+-	--pii-fields – Comma-separated list of PII fields to obfuscate
+
+### Where to View the Obfuscated Data
+
+By default, the obfuscated data is printed to stdout. If the file is written back to S3, check the output location in the S3 bucket.
+
+To save locally, redirect the output:
+
+```sh
+gdpr-obfuscate --s3-uri s3://my-bucket/my-file.csv --pii-fields name,email > obfuscated_output.csv
+```
 
 ### As an Imported Function
+
 You can also import and use it within a Python script:
 
 ```python
-from src.main import obfuscate_file
+from gdpr_obfuscator.main import obfuscate_file
 
 event = {
     "file_to_obfuscate": "s3://my-bucket/my-file.csv",
@@ -41,6 +59,7 @@ event = {
 }
 
 obfuscated_file = obfuscate_file(event)
+print(obfuscated_file)
 ```
 
 ## Developer Guide
@@ -65,6 +84,26 @@ Run the test suite with:
 
 ```sh
 make unit-test
+```
+
+### Installing as a Library
+
+To use this as a library module in other projects, install it via:
+
+```sh
+pip install .
+```
+
+Then import it in your scripts:
+
+```sh
+from gdpr_obfuscator.main import obfuscate_file
+```
+
+If running directly from the project without installation, set the PYTHONPATH:
+
+```sh
+export PYTHONPATH=$(pwd)/src
 ```
 
 ### Makefile Commands
@@ -115,13 +154,15 @@ The `Makefile` provides useful automation:
 ```
 gdpr-obfuscator-nc-postgrad-project/
 │── src/
-│   ├── main.py  # Contains `obfuscate_file` function
-│   ├── utils/   # Contains helper functions (e.g., S3 operations, parsing, obfuscation)
-│── tests/       # Unit tests
+│   ├── __init__.py  # Package initializer
+│   ├── main.py      # Contains `obfuscate_file` function and CLI entry point
+│   ├── utils/       # Contains helper functions (e.g., S3 operations, parsing, obfuscation)
+│── tests/           # Unit tests
 │── requirements.in  # Dependency definitions
 │── requirements.txt # Compiled dependencies
-│── Makefile     # Automation commands
-│── README.md    # Documentation
+│── setup.py         # Installation script
+│── Makefile         # Automation commands
+│── README.md        # Documentation
 ```
 
 ## Contributing

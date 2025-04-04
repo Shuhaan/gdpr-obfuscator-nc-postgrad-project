@@ -22,7 +22,10 @@ def obfuscate_file(event):
     return obfuscate_fields(parsed_data, event["pii_fields"], file_type)
 
 
-if __name__ == "__main__":
+def cli_entry_point():
+    import argparse
+    from src.main import obfuscate_file
+
     parser = argparse.ArgumentParser(description="Obfuscate PII fields in an S3 file")
     parser.add_argument(
         "--s3-uri", required=True, help="S3 URI of the file to obfuscate"
@@ -32,7 +35,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
     event = {"file_to_obfuscate": args.s3_uri, "pii_fields": args.pii_fields.split(",")}
 
     result = obfuscate_file(event)
+    print(result)
