@@ -3,7 +3,7 @@ import io
 import json
 import pandas as pd
 from unittest.mock import MagicMock
-from utils import (
+from src.utils import (
     extract_s3_info,
     detect_file_type,
     parse_file_content,
@@ -13,7 +13,7 @@ from utils import (
     obfuscate_fields,
     get_s3_object,
 )
-from main import obfuscate_file
+from src.main import obfuscate_file
 
 
 def test_extract_s3_info():

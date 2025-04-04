@@ -1,5 +1,5 @@
 import boto3
-from utils import (
+from src.utils import (
     extract_s3_info,
     get_s3_object,
     detect_file_type,

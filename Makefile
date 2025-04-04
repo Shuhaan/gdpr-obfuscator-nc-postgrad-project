@@ -13,8 +13,8 @@ PROFILE = default
 PIP := pip
 
 # Define the source directories
-SRC_DIRS := src
-# Define the PYTHONPATH to include both directories
+SRC_DIRS := ./
+# Define the PYTHONPATH
 PYTHONPATH := $(shell echo $(SRC_DIRS) | tr ' ' ':')
 
 TEST_DIR := tests
